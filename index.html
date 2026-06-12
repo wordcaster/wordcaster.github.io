@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>John Edgar Rojas: Senior technical writer, Amsterdam</title>
+  <meta name="description" content="I build the gates that make AI-assisted documentation trustworthy. Senior technical writer in Amsterdam, 17 years in the field.">
+  <link rel="canonical" href="https://wordcaster.github.io/">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://wordcaster.github.io/">
+  <meta property="og:title" content="John Edgar Rojas: Senior technical writer, Amsterdam">
+  <meta property="og:description" content="I build the gates that make AI-assisted documentation trustworthy.">
+  <meta property="og:image" content="https://wordcaster.github.io/assets/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="John Edgar Rojas: Senior technical writer, Amsterdam">
+  <meta name="twitter:description" content="I build the gates that make AI-assisted documentation trustworthy.">
+  <meta name="twitter:image" content="https://wordcaster.github.io/assets/og-image.png">
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    (function () {
+      try {
+        var t = localStorage.getItem('theme');
+        if (t === 'dark' || t === 'light') document.documentElement.dataset.theme = t;
+      } catch (e) {}
+    })();
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Sections">
+      <a href="#work">What I build</a>
+      <a href="#writing">Writing</a>
+      <a href="#selected">Selected work</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <button id="theme-toggle" type="button" aria-label="Toggle dark mode" aria-pressed="false">
+      <svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><circle cx="8" cy="8" r="6.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.75 A 6.25 6.25 0 0 1 8 14.25 Z" fill="currentColor"/></svg>
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <p class="eyebrow">Amsterdam &middot; Senior technical writer &middot; 17 years in the field</p>
+      <h1>John Edgar Rojas</h1>
+      <p class="headline">I build the gates that make AI-assisted documentation trustworthy.</p>
+      <p class="subhead">Documentation is shifting from producing content to verifying it. The interesting work moved upstream: the constraints, checks, and workflows that decide whether content can be trusted before a reader ever sees it. That's where I work.</p>
+    </section>
+
+    <section id="work" aria-labelledby="work-h">
+      <h2 id="work-h">What I build</h2>
+      <p>My team's AI agent reviews documentation pull requests. It's good. It will also, like every agent, happily report that it ran a check it never ran. I stopped accepting its word for anything and built the verification layer on top: mechanical scans that write evidence artifacts to disk, a shell hook that blocks the agent from posting a review until those artifacts exist and match the current commit, and a gap log that turns every missed catch into a new automated check. The agent can still claim whatever it likes. The hook doesn't read claims. It reads files.</p>
+      <p>Before the gates, seventeen years of the quieter fundamentals: API documentation, docs-as-code, information architecture, release engineering. Which turns out to be convenient, because the things technical writers have always done, topic-based authoring, metadata, structured content, are the same things AI teams now call grounding, chunking, and retrieval-faithfulness. Different vocabulary. Same discipline.</p>
+      <p class="demo-lead">Here's the principle, playable:</p>
+
+      <div class="gate-demo" id="gate-demo">
+        <div class="agent-msg">
+          <span class="agent-msg-label">agent</span>
+          <p>Ran all five scans. Zero issues. &#10003;</p>
+        </div>
+        <ul class="chips" aria-label="Review dimensions">
+          <li class="chip" data-state="none"><span class="chip-name">Clarity</span><span class="chip-status">no artifact</span></li>
+          <li class="chip" data-state="none"><span class="chip-name">Readability</span><span class="chip-status">no artifact</span></li>
+          <li class="chip" data-state="none"><span class="chip-name">Style</span><span class="chip-status">no artifact</span></li>
+          <li class="chip" data-state="none"><span class="chip-name">Completeness</span><span class="chip-status">no artifact</span></li>
+          <li class="chip" data-state="none"><span class="chip-name">Technical accuracy</span><span class="chip-status">no artifact</span></li>
+        </ul>
+        <p class="head-line">HEAD <span class="head-sha" id="head-sha">9f3a2c1</span></p>
+        <div class="artifacts" id="artifacts" tabindex="0" aria-label="Gate artifacts"></div>
+        <div class="gate-actions">
+          <button id="post-btn" type="button" class="btn btn-primary">Post review to GitHub</button>
+          <button id="scan-btn" type="button" class="btn">Run scans</button>
+          <button id="commit-btn" type="button" class="btn btn-tertiary">Push new commit</button>
+          <button id="reset-btn" type="button" class="btn-link">Reset</button>
+        </div>
+        <p id="gate-live" class="visually-hidden" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="writing" aria-labelledby="writing-h">
+      <h2 id="writing-h">Writing</h2>
+      <p>I write about AI-assisted documentation workflows as I build them, including the parts that don't work yet. New pieces land below automatically.</p>
+      <ul class="articles" id="articles">
+        <li class="article">
+          <h3 class="article-title"><a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">Checkbox theater: how I stopped trusting my AI agent to run the checks</a></h3>
+          <p class="article-meta">May 24, 2026</p>
+        </li>
+        <li class="article">
+          <h3 class="article-title"><a href="https://dev.to/wordcaster/i-kept-saying-the-same-five-things-in-every-doc-review-so-i-made-them-defaults-3lo4">I kept saying the same five things in every doc review, so I made them defaults</a></h3>
+          <p class="article-meta">May 14, 2026</p>
+        </li>
+      </ul>
+    </section>
+
+    <section id="selected" aria-labelledby="selected-h">
+      <h2 id="selected-h">Selected work</h2>
+      <!-- To add an entry: copy one <article class="work-entry"> block below and edit its
+           title, body, and links. Nothing else on the page changes. -->
+      <article class="work-entry">
+        <h3>AI doc review gating system</h3>
+        <p>A verification layer for an AI agent that reviews documentation PRs: evidence artifacts pinned to commit SHAs, a beforeShellExecution hook that physically blocks unverified posts, and a feedback loop that converts review lessons into mechanical checks. Built on top of my team's agent tooling. The code is internal; the thinking is public in the articles.</p>
+        <ul class="work-links">
+          <li><a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">Checkbox theater: how I stopped trusting my AI agent to run the checks</a></li>
+          <li><a href="https://dev.to/wordcaster/i-kept-saying-the-same-five-things-in-every-doc-review-so-i-made-them-defaults-3lo4">I kept saying the same five things in every doc review, so I made them defaults</a></li>
+        </ul>
+      </article>
+    </section>
+
+    <section id="contact" aria-labelledby="contact-h">
+      <h2 id="contact-h">Contact</h2>
+      <p>The fastest route is LinkedIn. Email works too; replies come from me, not an agent.</p>
+      <ul class="contact-links">
+        <li><a href="https://www.linkedin.com/in/jeprojas">LinkedIn</a></li>
+        <li><a href="mailto:jay.rojas@gmail.com">Email</a></li>
+        <li><a href="https://github.com/wordcaster">GitHub</a></li>
+        <li><a href="https://dev.to/wordcaster">Dev.to</a></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>Plain HTML, CSS, and JavaScript. No framework, no build step, no tracking. View source; that's rather the point.</p>
+  </footer>
+
+  <script src="main.js"></script>
+</body>
+</html>
