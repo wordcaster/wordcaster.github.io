@@ -1,0 +1,15 @@
+# Local working brief, not part of the public site
+portfolio-brief.md
+
+# OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+desktop.ini
+.DS_Store
+$RECYCLE.BIN/
+
+# Local tooling output
+.claude/
+lighthouse-report.*
+node_modules/
