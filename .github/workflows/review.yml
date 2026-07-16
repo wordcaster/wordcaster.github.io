@@ -1,0 +1,96 @@
+# review.yml: the page's own gate. Four real checks run against every push
+# to main, then manifest.json records exactly what ran and how it went, and
+# the page renders that file. A check name the manifest shows is a check
+# that executed; there is no other way in.
+#
+# Loop prevention, two independent brakes:
+#   1. paths-ignore: the manifest commit touches only manifest.json, which
+#      this trigger ignores, so that push cannot start another run.
+#   2. the manifest commit message carries [skip ci], which GitHub honors
+#      for push events even if the paths filter ever changes.
+#
+# Actions are pinned by commit SHA. On this site, "trust the tag" would be
+# a joke at the page's expense.
+name: review index.html
+
+on:
+  push:
+    branches: [main]
+    paths-ignore:
+      - manifest.json
+
+permissions:
+  contents: write
+
+concurrency:
+  group: review-main
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the pushed commit
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+
+      - name: Set up Node
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: '24'
+
+      - name: 'Check 1: HTML validation'
+        id: html
+        continue-on-error: true
+        run: npx --yes html-validate@11.5.6 index.html
+
+      - name: 'Check 2: links resolve'
+        id: links
+        continue-on-error: true
+        run: node tools/check-links.mjs
+
+      - name: 'Check 3: prose lint on visible copy'
+        id: prose
+        continue-on-error: true
+        run: node tools/prose-lint.mjs
+
+      - name: 'Check 4: cards match projects.json'
+        id: cards
+        continue-on-error: true
+        run: node tools/render-cards.mjs --check
+
+      - name: Write the manifest from what actually ran
+        env:
+          CHECK_HTML_VALIDATE: ${{ steps.html.outcome }}
+          CHECK_LINK_CHECK: ${{ steps.links.outcome }}
+          CHECK_PROSE_LINT: ${{ steps.prose.outcome }}
+          CHECK_CARDS: ${{ steps.cards.outcome }}
+        run: node tools/write-manifest.mjs
+
+      - name: Commit the manifest
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          if git diff --cached --quiet; then
+            echo "manifest unchanged, nothing to commit"
+          else
+            git commit -m "manifest: record checks for ${GITHUB_SHA::7} [skip ci]"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
+
+      - name: Fail the run if any check failed
+        env:
+          CHECK_HTML_VALIDATE: ${{ steps.html.outcome }}
+          CHECK_LINK_CHECK: ${{ steps.links.outcome }}
+          CHECK_PROSE_LINT: ${{ steps.prose.outcome }}
+          CHECK_CARDS: ${{ steps.cards.outcome }}
+        run: |
+          failed=0
+          for outcome in "$CHECK_HTML_VALIDATE" "$CHECK_LINK_CHECK" "$CHECK_PROSE_LINT" "$CHECK_CARDS"; do
+            if [ "$outcome" = "failure" ]; then failed=1; fi
+          done
+          if [ "$failed" = "1" ]; then
+            echo "one or more checks failed; the manifest records which"
+            exit 1
+          fi
