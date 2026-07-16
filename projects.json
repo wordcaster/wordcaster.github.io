@@ -1,0 +1,46 @@
+[
+  {
+    "id": "doc-review-gating",
+    "name": "AI doc review gating system",
+    "status": "shipped",
+    "description": "A verification layer for an AI agent that reviews documentation PRs: evidence artifacts pinned to commit SHAs, a beforeShellExecution hook that physically blocks unverified posts, and a feedback loop that converts review lessons into mechanical checks. Built on top of my team's agent tooling. The code is internal; the thinking is public in the articles.",
+    "proves": ["verification-system design", "agent orchestration"],
+    "links": [
+      {
+        "label": "Capturing review lessons: how I stopped my feedback loop from depending on my memory",
+        "url": "https://dev.to/wordcaster/capturing-review-lessons-how-i-stopped-my-feedback-loop-from-depending-on-my-memory-j89"
+      },
+      {
+        "label": "Mechanical pattern gates: how I turned recurring review comments into scans",
+        "url": "https://dev.to/wordcaster/mechanical-pattern-gates-how-i-turned-recurring-review-comments-into-scans-1c90"
+      },
+      {
+        "label": "Checkbox theater: how I stopped trusting my AI agent to run the checks",
+        "url": "https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1"
+      },
+      {
+        "label": "I kept saying the same five things in every doc review, so I made them defaults",
+        "url": "https://dev.to/wordcaster/i-kept-saying-the-same-five-things-in-every-doc-review-so-i-made-them-defaults-3lo4"
+      }
+    ],
+    "attribution_note": "Built on top of my team's agent tooling."
+  },
+  {
+    "id": "langextract-docs",
+    "name": "LangExtract documentation",
+    "status": "shipped",
+    "description": "An independent Diátaxis restructure of Google's open-source LLM structured-extraction library: a single flat README rebuilt into a navigable Docusaurus site with concept pages, task-based how-to guides, and a verified API reference. Built and verified with an orchestrated AI-assisted workflow.",
+    "proves": ["information architecture", "docs-as-code", "from-scratch build"],
+    "links": [
+      {
+        "label": "Live documentation site",
+        "url": "https://wordcaster.github.io/langextract/"
+      },
+      {
+        "label": "Source on GitHub",
+        "url": "https://github.com/wordcaster/langextract/tree/docs-site/docs-site"
+      }
+    ],
+    "repo": "wordcaster/langextract"
+  }
+]

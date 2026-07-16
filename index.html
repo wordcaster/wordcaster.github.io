@@ -27,6 +27,27 @@
       } catch (e) {}
     })();
   </script>
+  <script>
+    /* Boot-sequence hold. The page is complete without this: the hold class
+       is only ever applied here, by JavaScript, on a first visit per session
+       with motion allowed. No JS, a crawler, curl, or any error means no
+       hold and the full page, exactly like failClosed:false in the real
+       hook. main.js runs the sequence and releases the hold; the timeout and
+       error listener below release it even if main.js never arrives. */
+    (function () {
+      var docEl = document.documentElement;
+      function release() { docEl.classList.remove('boot-hold'); }
+      try {
+        if (sessionStorage.getItem('boot-played')) return;
+        if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        docEl.classList.add('boot-hold');
+        window.__bootFailsafe = window.setTimeout(release, 2000);
+        window.addEventListener('error', release);
+      } catch (e) {
+        release();
+      }
+    })();
+  </script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -49,12 +70,14 @@
       <h1>John Edgar Rojas</h1>
       <p class="headline">I build the gates that make AI-assisted documentation trustworthy.</p>
       <p class="subhead">Documentation is shifting from producing content to verifying it. The interesting work moved upstream: the constraints, checks, and workflows that decide whether content can be trusted before a reader ever sees it. That's where I work.</p>
+      <p class="review-caption">This page passed review before it rendered. So does everything I ship.</p>
+      <p class="boot-residue">reviewed at deploy &middot; <a href="#manifest" class="residue-sha">&hellip;</a> &middot; <a href="#manifest">manifest</a></p>
     </section>
 
     <section id="work" aria-labelledby="work-h">
       <h2 id="work-h">What I build</h2>
-      <p>My team's AI agent reviews documentation pull requests. It's good. It will also, like every agent, happily report that it ran a check it never ran. I stopped accepting its word for anything and built the verification layer on top: mechanical scans that write evidence artifacts to disk, a shell hook that blocks the agent from posting a review until those artifacts exist and match the current commit, and a gap log that turns every missed catch into a new automated check. The agent can still claim whatever it likes. The hook doesn't read claims. It reads files.</p>
-      <p>Before the gates, seventeen years of the quieter fundamentals: API documentation, docs-as-code, information architecture, release engineering. Which turns out to be convenient, because the things technical writers have always done, topic-based authoring, metadata, structured content, are the same things AI teams now call grounding, chunking, and retrieval-faithfulness. Different vocabulary. Same discipline.</p>
+      <p>My team's AI agent reviews documentation pull requests. It's good. It will also, like every agent, happily report that it ran a check it never ran. I stopped accepting its word for anything and <span class="evidence-note"><button type="button" class="evidence-trigger" aria-expanded="false">built the verification layer on top</button><span class="evidence-card" role="note"><span class="evidence-label">evidence</span><span class="evidence-body">The layer is mine; the agent tooling under it is my team's. The full story, including what failed first: <a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">Checkbox theater: how I stopped trusting my AI agent to run the checks</a></span></span></span>: mechanical scans that write evidence artifacts to disk, a shell hook that blocks the agent from posting a review until those artifacts exist and match the current commit, and a gap log that turns every missed catch into a new automated check. The agent can still claim whatever it likes. The hook doesn't read claims. It reads files.</p>
+      <p>Before the gates, <span class="evidence-note"><button type="button" class="evidence-trigger" aria-expanded="false">seventeen years</button><span class="evidence-card" role="note"><span class="evidence-label">evidence</span><span class="evidence-body">Technical writer since 2008. Fintech, enterprise software, healthcare, media. The artifacts are on <a href="https://dev.to/wordcaster">Dev.to</a>.</span></span></span> of the quieter fundamentals: API documentation, docs-as-code, information architecture, release engineering. Which turns out to be convenient, because the things technical writers have always done, topic-based authoring, metadata, structured content, are the same things AI teams now call grounding, chunking, and retrieval-faithfulness. Different vocabulary. Same discipline.</p>
       <p class="demo-lead">Here's the principle, playable:</p>
 
       <div class="gate-demo" id="gate-demo">
@@ -106,10 +129,12 @@
 
     <section id="selected" aria-labelledby="selected-h">
       <h2 id="selected-h">Selected work</h2>
-      <!-- To add an entry: copy one <article class="work-entry"> block below and edit its
-           title, body, and links. Nothing else on the page changes. -->
-      <article class="work-entry">
-        <h3>AI doc review gating system</h3>
+      <!-- BEGIN selected-work (generated from projects.json by tools/render-cards.mjs; edit the JSON and re-run, not this block) -->
+      <article class="work-entry" id="project-doc-review-gating">
+        <div class="work-entry-head">
+          <h3>AI doc review gating system</h3>
+          <span class="status-chip" data-status="shipped">shipped</span>
+        </div>
         <p>A verification layer for an AI agent that reviews documentation PRs: evidence artifacts pinned to commit SHAs, a beforeShellExecution hook that physically blocks unverified posts, and a feedback loop that converts review lessons into mechanical checks. Built on top of my team's agent tooling. The code is internal; the thinking is public in the articles.</p>
         <ul class="work-links">
           <li><a href="https://dev.to/wordcaster/capturing-review-lessons-how-i-stopped-my-feedback-loop-from-depending-on-my-memory-j89">Capturing review lessons: how I stopped my feedback loop from depending on my memory</a></li>
@@ -117,15 +142,22 @@
           <li><a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">Checkbox theater: how I stopped trusting my AI agent to run the checks</a></li>
           <li><a href="https://dev.to/wordcaster/i-kept-saying-the-same-five-things-in-every-doc-review-so-i-made-them-defaults-3lo4">I kept saying the same five things in every doc review, so I made them defaults</a></li>
         </ul>
+        <p class="work-proves"><span class="proves-label">proves:</span> verification-system design &middot; agent orchestration</p>
       </article>
-      <article class="work-entry">
-        <h3>LangExtract documentation</h3>
-        <p>An independent Diátaxis restructure of Google's open-source LLM structured-extraction library: a single flat README rebuilt into a navigable Docusaurus site with concept pages, task-based how-to guides, and a verified API reference. Built and verified with an orchestrated AI-assisted workflow.</p>
+      <article class="work-entry" id="project-langextract-docs">
+        <div class="work-entry-head">
+          <h3>LangExtract documentation</h3>
+          <span class="status-chip" data-status="shipped">shipped</span>
+        </div>
+        <p>An independent Diátaxis restructure of Google's open-source LLM structured-extraction library: a single flat README rebuilt into a navigable Docusaurus site with concept pages, task-based how-to guides, and a <span class="evidence-note"><button type="button" class="evidence-trigger" aria-expanded="false">verified</button><span class="evidence-card" role="note"><span class="evidence-label">evidence</span><span class="evidence-body">Independently reviewed for accuracy after the build. Zero accuracy errors found. Judge for yourself: <a href="https://wordcaster.github.io/langextract/">wordcaster.github.io/langextract</a></span></span></span> API reference. Built and verified with an orchestrated AI-assisted workflow.</p>
         <ul class="work-links">
           <li><a href="https://wordcaster.github.io/langextract/">Live documentation site</a></li>
           <li><a href="https://github.com/wordcaster/langextract/tree/docs-site/docs-site">Source on GitHub</a></li>
         </ul>
+        <p class="work-proves"><span class="proves-label">proves:</span> information architecture &middot; docs-as-code &middot; from-scratch build</p>
+        <p class="work-activity" data-repo="wordcaster/langextract" hidden></p>
       </article>
+      <!-- END selected-work -->
     </section>
 
     <section id="contact" aria-labelledby="contact-h">
@@ -137,6 +169,12 @@
         <li><a href="https://github.com/wordcaster">GitHub</a></li>
         <li><a href="https://dev.to/wordcaster">Dev.to</a></li>
       </ul>
+    </section>
+
+    <section id="manifest" aria-labelledby="manifest-h">
+      <h2 id="manifest-h">Manifest</h2>
+      <p>Every push to main runs a review Action; the Action writes what it actually checked to <a href="manifest.json">manifest.json</a>. This block renders that file as found, and says so when it knows less.</p>
+      <pre class="manifest-pre" id="manifest-pre">JavaScript renders manifest.json here. Without it, the raw file above is the evidence.</pre>
     </section>
   </main>
 
