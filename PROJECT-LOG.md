@@ -3,161 +3,159 @@
 Continuity record for agents and humans working on wordcaster.github.io.
 Read this first; update it last.
 
-## Current state (2026-07-16)
+## Current state (2026-07-16, second session)
 
-Branch `evidence-aesthetic` holds the full evidence-aesthetic batch, pushed to
-origin, NOT merged. Main is untouched; merging main is John's call alone and
-deploys the live site. All seven moves of the batch are built and
-machine-verified; John's review gates the merge.
+Branch `code-review-redesign` holds the v4 page design, integrated and
+machine-verified, pushed to origin, NOT merged. Main is untouched; merging
+main is John's call alone and deploys the live site.
 
-What the batch contains:
+**The `evidence-aesthetic` branch is superseded as a page design.** Its
+engineering survived: the deploy Action, check scripts, and manifest rules
+were ported to this branch and adapted. The branch itself stays on origin
+untouched, as a record.
 
-1. **Boot sequence**: inline head script applies a `boot-hold` class (first
-   visit per session, motion allowed, JS on); main.js types `$ review
-   index.html`, ticks five dimensions, shows `5/5 dimensions PASS`, then
-   staged reveal. Measured 1360-1362ms on consecutive first visits (budget
-   1500ms), via `performance.measure('boot-sequence')`. Any pointerdown or
-   keydown skips instantly. Fail-open: the resting CSS state is the fully
-   visible page; the hold is released by completion, skip, a 2s failsafe
-   timeout, or a window error listener. Mirrors `failClosed:false` in the
-   real hook, deliberately.
-2. **Evidence annotations**: three, exactly: "seventeen years", "built the
-   verification layer on top" (both in #work prose), and "verified" on the
-   LangExtract card (injected by the render script's ANNOTATIONS table).
-   CSS-only reveal on hover/focus-within; JS adds tap-to-toggle,
-   aria-expanded, Escape, click-out. Cards work with JS disabled.
-3. **Manifest**: `#manifest` section renders manifest.json client-side.
-   Fallback chain: manifest.json → GitHub API latest commit (labeled as
-   exactly that, sessionStorage-cached) → a plain "nothing verifiable"
-   sentence. No path can display a check name that did not run: the page
-   renders the file as found, and the file is written only from step
-   outcomes.
-4. **projects.json substrate**: two entries, both `shipped`, copy verbatim
-   from the previous hand-written cards. `tools/render-cards.mjs`
-   regenerates the card block between BEGIN/END markers in index.html;
-   byte-identical across runs (verified by SHA256 of two consecutive runs).
-   `--check` mode is the CI drift gate; deliberately editing projects.json
-   without re-rendering makes it exit 1 (verified, then restored).
-   attribution_note is enforced: the script fails if the note is not
-   verbatim inside the description.
-5. **Demo → artifact viewer**: running scans writes a parseable gate.json
-   (pr_head_oid, dimensions{hits,status}, status) into the panel line by
-   line; push-commit strikes it stale, turns the pr_head_oid line deny-red,
-   and appends a `✗ stale` marker with the pinned sha vs HEAD. Full rewrite
-   of the demo's artifact rendering, not the minimal scope-valve version;
-   the existing code structure took the extension cleanly.
-6. **Typography/color**: headings + hero caption use a system serif stack
-   (`ui-serif, "Iowan Old Style", "Palatino Linotype", Palatino, Georgia,
-   serif`) at zero bytes. Mono is now semantic-only (eyebrow and article
-   dates lost mono; evidence contexts kept it). New tokens: `--pass`,
-   `--deny`, `--wip` in both themes; `--wip` reserved for the in-progress
-   chip, which nothing uses yet (both entries are shipped, which is the
-   truth).
-7. **README**: documents the Action's four checks, the add-a-check
-   two-part rule, the manifest-names-only-what-ran rule, and the
-   projects.json loop.
+What this branch contains:
 
-## Decisions and reasoning
+1. **The v4 design**, human-blessed, committed verbatim as
+   `design/v4-source.html`. `index.html` is DERIVED from it with exactly
+   three integration transforms and nothing else: (a) self-hosted fonts,
+   (b) live-value placeholders plus the manifest renderer script,
+   (c) `font-weight:650` normalized to 600 (IBM Plex has no 650). Copy is
+   final; do not restyle or rewrite.
+2. **Self-hosted fonts**: latin-subset woff2 under `fonts/`, 75KB total
+   (budget 120KB). IBM Plex Sans is the v23 variable file, one request for
+   weights 400-600; Mono 400/500 are static instances. OFL license
+   committed alongside. Zero third-party requests; the only external call
+   the page can make is the GitHub API sha fallback.
+3. **Substrates**: `projects.json` (work rows) and `writing.json`
+   (series + standalones) reproduce the design sections byte-for-byte via
+   `tools/render.js` (CommonJS, deterministic, no timestamps).
+   `--check` is the CI drift gate; `--selftest` proves the dormant
+   series-collapse rule; `--fixture <path>` writes a throwaway preview.
+   The render fails if the attribution sentence leaves projects.json.
+4. **Series-collapse rule (dormant)**: newest series (highest `order`)
+   renders expanded; older `complete` series collapse to a native
+   `<details>` summary line ("name · n parts · date range"); older
+   `in-progress` series stay expanded. With today's single series the
+   output is identical to the design.
+5. **Live values**: static HTML ships honest placeholders ("pending",
+   "checks: pending first deploy"). A second small script fetches
+   `manifest.json` and renders it as found: check names, pass/fail marks,
+   "N of M checks passed", sha in the residue line, verdict green only
+   when everything passed. On 404 it falls back to the GitHub API latest
+   commit sha (sessionStorage-cached), labeled as exactly that, and the
+   merge box says plainly the manifest is not yet available. No code path
+   renders a check name that was not fetched.
+6. **Action**: `.github/workflows/review.yml` ported from
+   evidence-aesthetic; checks renamed to the design's vocabulary:
+   `html_valid`, `links_ok`, `prose_lint`, `drift`. Same loop prevention
+   (paths-ignore + [skip ci]), same concurrency serialization, same
+   tip-check manifest commit flow, same SHA-pinned actions, same
+   install/check step split (a check that cannot bootstrap is omitted from
+   the manifest and still fails the gate).
+7. **Checks adapted to the v4 page**: `.htmlvalidate.json` allows exactly
+   the two inline-style properties the blessed markup uses (margin-top,
+   max-width). `prose-lint` allowlist entries are now rule-scoped; the
+   one entry exempts the em dash in the document title (blessed metadata).
+   The old habitual-"will" entry died with the old copy.
+8. **Housekeeping**: README rewritten for this architecture. Old
+   `styles.css` and `main.js` deleted (the v4 page is self-contained);
+   old index.html replaced. `assets/` (favicon, og-image) untouched but
+   currently unreferenced by the v4 head, `langextract/` not part of this
+   repo, nothing else touched.
 
-- **Font choice (move 6 preference order)**: took option (b), the system
-  serif stack, not a self-hosted woff2. Reasons: zero bytes and zero binary
-  blobs in a view-source site, no build-time third-party fetch, and this
-  agent's operating rules require explicit permission per file download,
-  which the single consolidated checkpoint had already passed. If John wants
-  Fraunces, it is a follow-up: subset woff2 under 60KB, self-hosted,
-  license file alongside.
-- **Loop prevention (move 3)**: two independent brakes. (1) The workflow
-  triggers on push to main with `paths-ignore: [manifest.json]`; the
-  manifest commit touches only manifest.json, so the path filter excludes
-  the entire push event. (2) The commit message carries `[skip ci]`, which
-  GitHub Actions honors for push events independently of path filters.
-  Either brake alone stops the loop; both would have to fail
-  simultaneously.
-- **Manifest commit flow on a busy main**: runs are serialized by a
-  `concurrency` group, and the commit step only pushes if origin/main still
-  equals the sha the checks ran against; otherwise it steps aside, because
-  the newer push's run records its own manifest. Every manifest commit's
-  parent is therefore exactly the sha the manifest describes, and two
-  quick pushes can never produce a rebase conflict or a stale manifest on
-  a newer tree. (The first design rebased-and-pushed; review caught that it
-  could conflict and could land manifest(X) on top of commit Y.)
-- **Checks that never ran stay unnamed**: html-validate's npm install is a
-  separate step; if the registry or network fails, the check step is
-  skipped, the manifest omits it, and the gate step still turns the run
-  red because a review with a missing check is not a passing review.
-  Known bound, accepted and documented: html-validate's own transitive
-  dependencies are not lockfile-pinned (this repo deliberately has no
-  package.json); the tool version itself is exact-pinned.
-- **Manifest on failure**: a failing check still writes and commits an
-  honest manifest (result: "fail") and the run goes red afterwards. The
-  page shows what happened; Pages deploys on push regardless of this
-  workflow, so hiding the manifest would just be a worse lie.
-- **First manifest**: manifest.json first exists after the first push to
-  main, which happens after John merges. Until then the page uses the
-  GitHub API fallback and labels it as such. The check-links tool allowlists
-  manifest.json as missing-by-design for the same reason.
-- **Garnish data source**: repo-level `pushed_at` (last push to any
-  branch), not default-branch commit date, because the langextract fork's
-  work lives on the `docs-site` branch and the default branch would show a
-  stale upstream date. Verified against the live API: pushed_at 2026-06-22
-  renders "last activity: 3 weeks ago".
-- **Prose lint vs approved copy**: the approved sentence "It will also,
-  like every agent, happily report…" is habitual "will", not future tense.
-  The lint has a scoped allowlist (`tools/prose-lint-allow.json`) with that
-  one entry and its reason; the exemption applies only inside the exact
-  snippet. A fixture test confirmed other will/would still fail.
-- **Line endings**: `.gitattributes` pins LF for all text so the
-  byte-identical drift check behaves the same on a Windows working tree and
-  the Linux runner. The render script also normalizes CRLF when reading,
-  treating line endings as git's domain, content as its own.
-- **PROJECT-LOG.md is committed**, not local-only: a public build log on a
-  site whose whole thesis is inspectable evidence is a feature, and future
-  agents get continuity from any clone. Flagged to John at review.
+## Decisions and reasoning (this session)
+
+- **Fonts, option taken**: Google-served latin woff2, self-hosted. The
+  brief authorized the fetch route explicitly, and the v23 Sans variable
+  file made the budget trivial (75KB total). unicode-range kept identical
+  to Google's serving so fallback behavior for ✓/✕/→ glyphs is unchanged
+  (they fall to system fonts by design, same as when Google hosted).
+- **No end-markers in the generated regions**: the render script splices
+  between each GENERATED comment and the section's closing
+  `</div></section>`, so index.html's generated sections stay byte-identical
+  to the design file. The terminator is unambiguous because generated
+  content never emits a four-space-indented `</div>`.
+- **`.x` class for failed checks**: one CSS rule added next to
+  `.mergebox .checks .c`, using the existing `--del-ink` token. Required
+  by transform C (a manifest can carry `fail`); the only styling addition
+  in the whole derivation.
+- **Fallback labeling**: the GitHub-API sha renders with "via the GitHub
+  API" in the merge box, so the page never implies a review happened
+  before the first manifest exists.
+- **manifest.json is not gitignored**: CI must commit it on main. It is
+  simply absent on this branch.
 
 ## Verification notes (what was actually run)
 
-See the acceptance checklist in the delivery message of 2026-07-16; every
-"pass" there was executed, not assumed. Environment caveats recorded
-honestly: the browser pane ran hidden (no painted pixels), so visual checks
-were computed-style and geometry assertions plus John's own eyes at review;
-reduced-motion was tested via a matchMedia stub copy of the page, not an OS
-toggle; actionlint was unavailable, so the workflow got a js-yaml parse
-plus review instead.
+Every acceptance item was executed, not assumed:
 
-A multi-agent adversarial review ran over the batch; a session usage limit
-killed most of the verifier agents mid-run, so the 7 raw findings were
-triaged by hand instead of by the skeptic fleet, and the two reviewer
-dimensions that never started (JS correctness, repo tools) were re-reviewed
-inline. Outcome: 6 findings fixed (:has fallback, JS-owned keyboard reveal
-with truthful aria-expanded + Escape focus return, focusable manifest pre,
-boot-chip border fallback, tip-check manifest push flow, install/check step
-split), 1 accepted and documented (html-validate transitive dependencies).
+- No-JS curl: 12 content assertions pass (all sections, greeting comment,
+  honest placeholders, no fake "5/5 pass" in static HTML).
+- Request log across three loads: same-origin only (page, manifest,
+  3 fonts). Google Fonts gone. GitHub API called only when manifest 404s.
+- Fonts: variable axis verified with fontTools (wght 100-700); computed
+  h1 = IBM Plex Sans 600; fallback stacks hold layout (h1 one line, no
+  horizontal scroll) when --sans/--mono lose the Plex names.
+- Render: two runs → identical SHA256; first render over the derived file
+  reported "already matches" (substrates reproduce the design bytes).
+- Drift: pass → substrate edit fails with exit 1 → restore passes.
+- Manifest states: sample manifest with a fail and an omitted check
+  rendered exactly (✓✓✕, "2 of 3", no green verdict, omitted name absent);
+  404 state rendered the pending text + fallback sha 6dae060; cached-sha
+  path exercised on reload.
+- Boot: 2157ms eval→reveal measured in-page (budget ~2300ms); skip via
+  keydown at 200ms revealed at 212ms; reduced-motion (matchMedia stub over
+  the real script) never holds and leaves the booted flag unset; repeat
+  visit never holds; JS-disabled resting state is the visible page.
+- Marks: five `mark.anchor`; real hover intensified mark bg, claim border,
+  and comment border to the expected dark-theme token values.
+- html-validate passes with the scoped config; links: 17 resolve,
+  LinkedIn skipped as bot-blocked (status 999), needs a human eyeball;
+  prose lint clean; workflow YAML parses (js-yaml), 10 steps, ids and
+  paths-ignore confirmed; write-manifest with mixed outcomes recorded
+  a skipped check by omission, exactly as specified.
+- Layout: 320/768/1280/1680, no horizontal scroll anywhere; pair grid
+  collapses under 860px; light + dark tokens verified by computed values.
+
+Environment caveats, recorded honestly: the browser pane ran unpainted
+(screenshots timed out), so visual checks are computed-style and geometry
+assertions; John's eyes at review are the pixel check, as last session.
+Synthesized keypresses did not reach the page either, so the collapse
+fixture's keyboard operability rests on: summary focusable (verified),
+programmatic activation toggles both ways (verified), and native
+`<details>/<summary>` key handling being user-agent behavior with no
+custom handlers in the page. The fixture page itself was verified
+structurally and then deleted; it was never committed.
 
 ## Artifact map
 
-- `index.html` — all content, including generated Selected work block
-  (BEGIN/END markers) and inline boot-hold head script
-- `styles.css` — tokens (`--pass/--deny/--wip/--serif`), boot styles,
-  evidence cards, status chips, manifest pre
-- `main.js` — boot, theme, feed, annotations, manifest render, garnish,
-  gate demo (artifact viewer)
-- `projects.json` — card substrate (source of truth)
-- `tools/render-cards.mjs` — generator + drift check (`--check`)
-- `tools/prose-lint.mjs` + `tools/prose-lint-allow.json` — copy lint
-- `tools/check-links.mjs` — link check (LinkedIn skip + manifest allowance
-  documented in-file)
+- `index.html` — the page, derived from design/v4-source.html; two
+  GENERATED regions owned by tools/render.js
+- `design/v4-source.html` — blessed v4 design record (canonical reference)
+- `projects.json`, `writing.json` — substrates (sources of truth)
+- `tools/render.js` — generator + drift gate + collapse selftest/fixture
+- `tools/prose-lint.mjs` + `tools/prose-lint-allow.json` — copy lint,
+  rule-scoped allowlist
+- `tools/check-links.mjs` — link check (LinkedIn skip + manifest
+  allowance documented in-file)
 - `tools/write-manifest.mjs` — manifest writer (CHECKS table = the
   add-a-check registry)
 - `.github/workflows/review.yml` — the deploy Action, SHA-pinned
+- `.htmlvalidate.json` — scoped inline-style allowance
+- `fonts/` — 3 woff2 + OFL license
 - `.gitattributes` — LF policy
 - `README.md` — maintenance model
+- superseded on this branch: styles.css, main.js (deleted); the
+  evidence-aesthetic branch design (branch preserved on origin)
 
 ## Open questions for John
 
 1. Merge to main? (The only remaining gate.)
-2. Visual taste: boot pacing, serif choice, chip tints, evidence-card
-   shadow. All adjustable without structural change.
-3. Keep PROJECT-LOG.md public in the repo, or move it out?
+2. The v4 head has no favicon/og-image links; `assets/` still carries
+   both files. Add the two link tags (a copy change to the blessed head,
+   so John's call), or leave as is?
+3. Final look on the real domain after merge.
 
 ## Session log
 
@@ -167,3 +165,11 @@ split), 1 accepted and documented (html-validate transitive dependencies).
   "will", LF pinning, manifest-on-failure, PROJECT-LOG committed | Handoff:
   John reviews branch preview and says "merge" or requests changes | Open:
   merge gate, visual taste, PROJECT-LOG location.
+- 2026-07-16 | Claude (Fable 5) | Integrated the blessed v4 design on
+  branch code-review-redesign (supersedes evidence-aesthetic's design;
+  ported its Action/checks); self-hosted fonts, substrates + render,
+  dormant series-collapse, honest live values; full acceptance run |
+  Decisions: variable-font self-hosting, marker-splice rendering without
+  end markers, rule-scoped lint allowlist, scoped html-validate config,
+  .x fail styling | Handoff: John reviews preview and says "merge" |
+  Open: merge gate, favicon/og links, pixels on the real domain.
