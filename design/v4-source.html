@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<!--
+  You viewed source. Good instinct. That is more or less the entire thesis
+  of the page you are reading: claims are cheap, artifacts are checkable.
+
+  What you are looking at:
+  - No framework, no build step. HTML, CSS, one small script.
+  - manifest.json is written by the deploy Action and names only the
+    checks that actually ran. If a check is not listed, it did not run.
+  - The boot sequence fails open. If the script dies, you get the page.
+
+  The system that taught me to stop trusting self-reports:
+  https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1
+-->
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>John Edgar Rojas — Documentation engineering and verification</title>
+<meta name="description" content="I build the gates that make AI-assisted documentation trustworthy. Documentation engineering, verification systems, and information architecture. Amsterdam.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;650&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#FCFCFA; --panel:#F6F6F3; --ink:#16150F; --muted:#6B6A62;
+  --line:#E2E1DA; --line-strong:#16150F;
+  --add-bg:#E4F2E6; --add-ink:#1D6B33; --del-bg:#FBEAE7; --del-ink:#A5321F;
+  --link:#0B57A4; --check:#1D6B33;
+  --hl:#F8ECC0; --hl-strong:#F3DE8A;
+  --sans:"IBM Plex Sans",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --paper:#151511; --panel:#1D1D18; --ink:#EAE9E2; --muted:#98968B;
+    --line:#33322B; --line-strong:#EAE9E2;
+    --add-bg:#15301D; --add-ink:#7FC993; --del-bg:#3A1B15; --del-ink:#E58A78;
+    --link:#7BB3E8; --check:#7FC993;
+    --hl:#3C351C; --hl-strong:#57491F;
+  }
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion: reduce){html{scroll-behavior:auto}}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.65;-webkit-font-smoothing:antialiased}
+a{color:var(--link);text-decoration:none}
+a:hover{text-decoration:underline;text-underline-offset:3px}
+a:focus-visible{outline:2px solid var(--link);outline-offset:2px;border-radius:2px}
+.wrap{max-width:1020px;margin:0 auto;padding:0 24px}
+.mono{font-family:var(--mono)}
+
+.topbar{border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--paper);z-index:10}
+.topbar .wrap{display:flex;justify-content:space-between;align-items:center;gap:14px;padding-top:12px;padding-bottom:12px;font-family:var(--mono);font-size:12px}
+.topbar .repo{color:var(--muted)}
+.topbar .repo b{color:var(--ink);font-weight:500}
+.topbar nav{display:flex;gap:18px;flex-wrap:wrap}
+.topbar nav a{color:var(--muted)}
+.topbar nav a:hover{color:var(--ink);text-decoration:none}
+
+.hero{padding:76px 0 56px}
+.kicker{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:18px}
+.hero h1{font-weight:650;font-size:clamp(44px,7.5vw,84px);line-height:1.0;letter-spacing:-.03em}
+.statement{font-size:clamp(19px,2.5vw,25px);font-weight:500;letter-spacing:-.01em;max-width:26ch;margin-top:22px;line-height:1.4}
+.diff{font-family:var(--mono);font-size:clamp(13px,1.9vw,16px);line-height:2.15;border:1px solid var(--line);border-radius:6px;overflow:hidden;margin-top:30px;max-width:640px}
+.diff .row{display:flex}
+.diff .g{width:38px;text-align:center;flex-shrink:0;font-weight:500}
+.diff .t{padding:0 16px;flex:1;min-width:0}
+.diff .del .g,.diff .del .t{background:var(--del-bg);color:var(--del-ink)}
+.diff .del .t{text-decoration:line-through;text-decoration-thickness:1px}
+.diff .add .g,.diff .add .t{background:var(--add-bg);color:var(--add-ink)}
+.context{font-size:16.5px;color:var(--muted);max-width:54ch;margin-top:26px}
+.caption{font-size:14.5px;color:var(--ink);margin-top:30px;max-width:54ch}
+.residue{font-family:var(--mono);font-size:12px;color:var(--muted);margin-top:10px}
+.residue .ok{color:var(--check)}
+.residue a{color:var(--muted);border-bottom:1px dotted var(--muted)}
+.residue a:hover{color:var(--ink);text-decoration:none}
+
+section.doc{border-top:1px solid var(--line);padding:52px 0 56px}
+.eyebrow{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:26px}
+h2.sechead{font-weight:650;font-size:clamp(23px,3.2vw,30px);letter-spacing:-.02em;margin-bottom:30px;max-width:24ch}
+
+.pair{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px;align-items:start}
+.pair + .pair{margin-top:34px}
+.pair .comment{position:relative}
+.pair .comment::before{content:"";position:absolute;left:-22px;top:18px;width:21px;border-top:1px solid var(--line)}
+.pair:hover .comment::before{border-top-color:var(--muted)}
+#build .pair:nth-of-type(2) .comment{margin-top:14px}
+#build .pair:nth-of-type(2) .comment::before{top:32px}
+#build .pair:nth-of-type(3) .comment{margin-top:34px}
+#build .pair:nth-of-type(3) .comment::before{top:52px}
+#work .work-row:first-of-type .comment{margin-top:26px}
+#work .work-row:first-of-type .comment::before{top:44px}
+#work .work-row:last-of-type .comment{margin-top:8px}
+#work .work-row:last-of-type .comment::before{top:26px}
+.claim{font-size:16.5px;max-width:56ch;border-left:2px solid var(--line);padding-left:16px;transition:border-color .15s ease}
+mark.anchor{background:var(--hl);color:inherit;padding:0 3px;border-radius:2px;transition:background-color .15s ease}
+.pair:hover mark.anchor{background:var(--hl-strong)}
+.pair:hover .claim{border-left-color:var(--ink)}
+.comment{border:1px solid var(--line);border-radius:6px;background:var(--panel);padding:11px 13px;transition:border-color .15s ease}
+.pair:hover .comment{border-color:var(--muted)}
+.comment .chead{font-family:var(--mono);font-size:11px;color:var(--muted);margin-bottom:7px}
+.comment .chead .ok{color:var(--check)}
+.comment .chead .no{color:var(--del-ink)}
+.comment pre{font-family:var(--mono);font-size:11px;line-height:1.65;color:var(--ink);white-space:pre;overflow-x:auto;margin-bottom:8px}
+.comment pre .ok{color:var(--check)}
+.comment pre.deny{color:var(--del-ink)}
+.comment .cnote{font-family:var(--mono);font-size:11px;line-height:1.6;color:var(--muted);margin-bottom:8px}
+.comment .act{font-family:var(--mono);font-size:11.5px}
+
+.work-row{border-top:1px solid var(--line);padding:30px 0}
+.work-row:first-of-type{border-top:0;padding-top:0}
+.work-head{display:flex;justify-content:space-between;align-items:baseline;gap:14px;flex-wrap:wrap;max-width:56ch}
+.work-head h3{font-weight:650;font-size:20px;letter-spacing:-.015em}
+.status{font-family:var(--mono);font-size:11px;color:var(--check)}
+.proves{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-top:7px}
+.desc{margin-top:12px;max-width:56ch;font-size:15.5px}
+.attr{font-size:13.5px;color:var(--muted);margin-top:8px;max-width:56ch}
+
+.serieslabel{font-size:15px;color:var(--muted);max-width:56ch;margin-bottom:26px}
+.grouplabel{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin:0 0 14px}
+.thread{list-style:none;position:relative;padding-left:26px;max-width:640px}
+.thread::before{content:"";position:absolute;left:5px;top:8px;bottom:8px;border-left:1px solid var(--line)}
+.thread li{position:relative;padding:9px 0}
+.thread li::before{content:"";position:absolute;left:-25px;top:17px;width:11px;height:11px;border-radius:50%;background:var(--paper);border:1.5px solid var(--muted)}
+.thread li:last-child::before{background:var(--check);border-color:var(--check)}
+.thread .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.thread a{color:var(--ink);font-size:15.5px;font-weight:500;display:block;margin-top:1px}
+.thread a:hover{color:var(--link)}
+.standalones{list-style:none;margin-top:30px;max-width:640px}
+.standalones li{padding:9px 0 9px 26px}
+.standalones .meta{font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.standalones a{color:var(--ink);font-size:15.5px;font-weight:500;display:block;margin-top:1px}
+.standalones a:hover{color:var(--link)}
+
+.contact-line{font-family:var(--mono);font-size:13px;display:flex;gap:26px;flex-wrap:wrap;margin-top:18px}
+
+.mergebox{border:1px solid var(--line);border-radius:6px;margin:60px auto 0;max-width:1020px}
+.mergebox .checks{display:flex;gap:20px;flex-wrap:wrap;align-items:center;padding:13px 18px;font-family:var(--mono);font-size:12px}
+.mergebox .checks .c{color:var(--check)}
+.mergebox .checks .meta{color:var(--muted)}
+.mergebox .closer{border-top:1px solid var(--line);padding:11px 18px;font-family:var(--mono);font-size:12px;color:var(--muted)}
+footer{padding:0 24px 40px}
+
+#boot{position:fixed;inset:0;background:var(--paper);z-index:50;display:none;align-items:flex-start;justify-content:center;padding-top:24vh;cursor:pointer}
+#boot .term{font-family:var(--mono);font-size:13px;line-height:2;color:var(--muted);min-width:min(400px,80vw)}
+#boot .term .ok{color:var(--check)}
+body.holding .topbar,body.holding main,body.holding footer{opacity:0}
+body.reveal .topbar,body.reveal main,body.reveal footer{opacity:1;transition:opacity .4s ease}
+
+@media (max-width:860px){
+  .pair{grid-template-columns:1fr}
+  .comment{max-width:440px}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="wrap">
+    <span class="repo">wordcaster / <b>john-edgar-rojas</b></span>
+    <nav aria-label="Sections">
+      <a href="#build">01 build</a>
+      <a href="#work">02 work</a>
+      <a href="#writing">03 writing</a>
+      <a href="#contact">04 contact</a>
+    </nav>
+    <span class="repo">Amsterdam</span>
+  </div>
+</div>
+
+<main>
+  <header class="hero wrap">
+    <p class="kicker">documentation engineering and verification · 17 years</p>
+    <h1>John Edgar Rojas</h1>
+    <p class="statement">I build the gates that make AI&#8209;assisted documentation trustworthy.</p>
+    <!-- The career, as a diff. -->
+    <div class="diff" role="img" aria-label="A diff: removed, a writer who uses AI. Added, the engineer of the system that verifies the work.">
+      <div class="row del"><span class="g">−</span><span class="t">a writer who uses AI</span></div>
+      <div class="row add"><span class="g">+</span><span class="t">the engineer of the system that verifies the work</span></div>
+    </div>
+    <p class="context">Documentation is shifting from producing content to verifying it. The interesting work moved upstream: the constraints, checks, and workflows that decide whether content can be trusted before a reader ever sees it. That's where I work.</p>
+    <p class="caption">This page passed review before it rendered. So does everything I ship.</p>
+    <p class="residue">reviewed at deploy · <a href="https://github.com/wordcaster/wordcaster.github.io">6dae060</a> · <span class="ok">5/5 pass</span> · <a href="#merge">checks</a></p>
+  </header>
+
+  <section class="doc" id="build">
+    <div class="wrap">
+      <p class="eyebrow">01 · what I build</p>
+      <h2 class="sechead">The hook doesn't read claims. It reads files.</h2>
+
+      <div class="pair">
+        <p class="claim">My team's AI agent reviews documentation pull requests. It's good. It also, like every agent, happily reports that <mark class="anchor">it ran a check it never ran</mark>. I stopped accepting its word for anything and built the verification layer on top: mechanical scans that write evidence artifacts to disk, pinned to the commit they ran against.</p>
+        <div class="comment">
+          <p class="chead"><span class="ok">✓</span> review · gate.json</p>
+          <pre>"style": {
+  "hits": 0,
+  "sha": "9f3a2c1"
+}</pre>
+          <p class="cnote">Written on every scan. Stale sha, stale evidence.</p>
+          <p class="act"><a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">view the artifact →</a></p>
+        </div>
+      </div>
+
+      <div class="pair">
+        <p class="claim">A shell hook intercepts every attempt to post a review. No artifact on disk, or one pinned to a stale commit, and the post is denied. The agent can still claim whatever it likes; <mark class="anchor">the sentence no longer affects anything</mark>.</p>
+        <div class="comment">
+          <p class="chead"><span class="no">✕</span> blocked · the deny</p>
+          <pre class="deny">BLOCKED gh pr comment
+gate.json is stale
+re-run review-gate.sh</pre>
+          <p class="cnote">Confidence is not evidence. It's a sentence about evidence.</p>
+        </div>
+      </div>
+
+      <div class="pair">
+        <p class="claim">And when a human reviewer catches something the gates missed, the miss is logged, then mechanized into a new scan. <mark class="anchor">The system's failures are its backlog.</mark> Nothing depends on me remembering a lesson.</p>
+        <div class="comment">
+          <p class="chead"><span class="ok">✓</span> review · gap log</p>
+          <pre>PR-1242 | complete
+nav entry missing
+status: <span class="ok">mechanized</span></pre>
+          <p class="cnote">One line per lesson. Mechanized means a script now catches it.</p>
+          <p class="act"><a href="https://dev.to/wordcaster/capturing-review-lessons-how-i-stopped-my-feedback-loop-from-depending-on-my-memory-j89">view the artifact →</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc" id="work">
+    <div class="wrap">
+      <p class="eyebrow">02 · selected work</p>
+      <!-- GENERATED: work rows are rendered from projects.json by tools/render.(js|py). Edit the JSON, not this HTML. -->
+
+      <div class="work-row">
+        <div class="pair">
+          <div>
+            <div class="work-head">
+              <h3>AI documentation review gating system</h3>
+              <span class="status">✓ shipped · in production</span>
+            </div>
+            <p class="proves">proves: verification-system design · agent orchestration</p>
+            <p class="desc">A five-dimension review architecture where <mark class="anchor">every check must produce a machine-readable artifact</mark> before the agent may act on its results. Scans, a blocking shell hook, and a gap log that turns review misses into new automated checks.</p>
+            <p class="attr">Built on top of my team's agent tooling. The verification layer is the part I designed.</p>
+          </div>
+          <div class="comment">
+            <p class="chead"><span class="ok">✓</span> review · enforcement</p>
+            <pre>artifacts pinned to HEAD
+posts denied without them
+fails open by design</pre>
+            <p class="cnote">Knowing when not to gate is the senior half of gating.</p>
+            <p class="act"><a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">read the full story →</a></p>
+          </div>
+        </div>
+      </div>
+
+      <div class="work-row">
+        <div class="pair">
+          <div>
+            <div class="work-head">
+              <h3>LangExtract documentation site</h3>
+              <span class="status">✓ shipped · live</span>
+            </div>
+            <p class="proves">proves: information architecture · docs-as-code · from-scratch build</p>
+            <p class="desc">A popular LLM extraction library whose entire documentation was one flat README. Rebuilt as a structured Docusaurus site: <mark class="anchor">content model first</mark>, twelve pages, quickstart to API reference.</p>
+          </div>
+          <div class="comment">
+            <p class="chead"><span class="ok">✓</span> review · verification</p>
+            <pre>12 pages · Diátaxis
+independent review:
+<span class="ok">0 accuracy errors</span></pre>
+            <p class="cnote">Reviewed for accuracy after the build, by someone who wasn't me.</p>
+            <p class="act"><a href="https://wordcaster.github.io/langextract/">visit the site →</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="doc" id="writing">
+    <div class="wrap">
+      <p class="eyebrow">03 · writing</p>
+      <!-- GENERATED: threads and standalones are rendered from writing.json by tools/render.(js|py). Edit the JSON, not this HTML. -->
+      <p class="serieslabel">Written as the system was built, one piece per layer. These are less writing samples than evidence.</p>
+      <p class="grouplabel">the gating series · 4 parts</p>
+      <ul class="thread">
+        <li><span class="meta">part 1 · 2026-05-14</span><a href="https://dev.to/wordcaster/i-kept-saying-the-same-five-things-in-every-doc-review-so-i-made-them-defaults-3lo4">I kept saying the same five things in every doc review. So I made them defaults</a></li>
+        <li><span class="meta">part 2 · 2026-05-24</span><a href="https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1">Checkbox theater: how I stopped trusting my AI agent to run the checks</a></li>
+        <li><span class="meta">part 3 · 2026-06-14</span><a href="https://dev.to/wordcaster/mechanical-pattern-gates-how-i-turned-recurring-review-comments-into-scans-1c90">Mechanical pattern gates: how I turned recurring review comments into scans</a></li>
+        <li><span class="meta">part 4 · 2026-06-21</span><a href="https://dev.to/wordcaster/capturing-review-lessons-how-i-stopped-my-feedback-loop-from-depending-on-my-memory-j89">Capturing review lessons: how I stopped my feedback loop from depending on my memory</a></li>
+      </ul>
+      <p class="grouplabel" style="margin-top:30px">standalones</p>
+      <ul class="standalones">
+        <li><span class="meta">2026-06-28</span><a href="https://dev.to/wordcaster/i-built-a-docs-site-without-writing-the-docs-the-part-that-was-mine-was-a-layer-up-5d5c">I built a docs site without writing the docs: the part that was mine was a layer up</a></li>
+        <li><span class="meta">2026-03-28</span><a href="https://dev.to/wordcaster/what-ai-actually-changed-about-my-work-as-a-technical-writer-2edh">What AI actually changed about my work as a technical writer</a></li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="doc" id="contact">
+    <div class="wrap">
+      <p class="eyebrow">04 · contact</p>
+      <p class="desc" style="max-width:54ch">Senior technical writer and documentation engineer, Amsterdam. Open to conversations about documentation systems, verification, and the layer above the prose.</p>
+      <p class="contact-line">
+        <a href="mailto:jay.rojas@gmail.com">jay.rojas@gmail.com</a>
+        <a href="https://www.linkedin.com/in/jeprojas">linkedin</a>
+        <a href="https://github.com/wordcaster">github</a>
+        <a href="https://dev.to/wordcaster">dev.to</a>
+      </p>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <!-- If a check's name is not in this box, that check did not run. -->
+  <div class="mergebox" id="merge">
+    <div class="checks">
+      <span class="c">✓ html_valid</span>
+      <span class="c">✓ links_ok</span>
+      <span class="c">✓ prose_lint</span>
+      <span class="meta">3 of 3 checks passed · 6dae060 · written by the deploy action; names only checks that ran</span>
+    </div>
+    <div class="closer">View source; that's rather the point.</div>
+  </div>
+</footer>
+
+<div id="boot" aria-hidden="true">
+  <div class="term" id="bootterm"></div>
+</div>
+
+<script>
+/* Fail-open. The hold is applied by JS, so no JS means no hold.
+   A gate whose false positives cost more than its false negatives
+   should fail open. This one animates a website. It fails open. */
+(function(){
+  try{
+    var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduce || sessionStorage.getItem('booted')) return;
+    sessionStorage.setItem('booted','1');
+    var body=document.body, boot=document.getElementById('boot'), term=document.getElementById('bootterm');
+    body.classList.add('holding');
+    boot.style.display='flex';
+    var lines=['$ review index.html','clarity \u2713','readability \u2713','style \u2713','completeness \u2713','accuracy \u2713','<span class="ok">5/5 dimensions PASS</span>'];
+    var delays=[0,420,600,780,960,1140,1450];
+    var timers=[];
+    lines.forEach(function(l,i){
+      timers.push(setTimeout(function(){ term.innerHTML += (i===0?'':'<br>') + l; }, delays[i]));
+    });
+    var endT=setTimeout(finish, 2150);
+    function finish(){
+      timers.forEach(clearTimeout); clearTimeout(endT);
+      boot.style.display='none';
+      body.classList.remove('holding');
+      body.classList.add('reveal');
+      document.removeEventListener('keydown',finish);
+      document.removeEventListener('pointerdown',finish);
+    }
+    document.addEventListener('keydown',finish);
+    document.addEventListener('pointerdown',finish);
+  }catch(e){
+    document.body.classList.remove('holding');
+  }
+})();
+</script>
+
+</body>
+</html>
