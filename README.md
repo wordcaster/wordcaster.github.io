@@ -17,6 +17,7 @@ View source and you see the whole site. That is rather the point.
 - `tools/render.js`: regenerates the two generated sections from the JSON files.
 - `tools/prose-lint.mjs`, `tools/check-links.mjs`, `tools/write-manifest.mjs`: the deploy checks.
 - `.github/workflows/review.yml`: the deploy Action.
+- `.nojekyll`: keeps Pages from Jekyll-processing the repo, so the site is served exactly as committed. It also keeps the deploy off Jekyll's `github-metadata` plugin, which calls the GitHub API at build time and fails the build when that API is degraded.
 - `fonts/`: woff2 files plus the IBM Plex OFL license.
 - `assets/`: favicon and Open Graph image.
 
