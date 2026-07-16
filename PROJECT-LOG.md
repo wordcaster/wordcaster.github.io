@@ -3,6 +3,37 @@
 Continuity record for agents and humans working on wordcaster.github.io.
 Read this first; update it last.
 
+## Current state (2026-07-17): MERGED AND LIVE
+
+`main` is deployed. The v4 page is live at https://wordcaster.github.io/,
+rendering its own manifest: residue line "reviewed at deploy · fe477cd ·
+4/4 pass", merge box "✓ html_valid ✓ links_ok ✓ prose_lint ✓ drift · 4 of
+4 checks passed · fe477cd". The loop the site argues for is closed: the
+Action ran the checks, wrote the manifest from step outcomes, committed it,
+and the page fetched and rendered that file. Production makes five
+requests, all same-origin.
+
+`code-review-redesign` is merged (fast-forward, 9 commits) and can be
+deleted whenever John likes. `evidence-aesthetic` stays as a record.
+
+### The Pages failure, and the fix
+
+The first Pages build of the merge FAILED ("Page build failed", commit
+1b9ee90, 23:12 UTC). Root cause, diagnosed by John: legacy Pages runs
+Jekyll, and Jekyll's `github-metadata` plugin calls api.github.com at build
+time; GitHub was mid-incident ("Degraded REST API Availability", opened
+22:51 UTC) and the call 503'd, taking the build down with it. The site kept
+serving the OLD build, which is why the live page still showed the previous
+design while git and the Action were both green. Worth noting for future
+debugging: the checks Action and the Pages deploy are INDEPENDENT: green
+checks do not mean a published site.
+
+Fix: `.nojekyll` at the repo root. Nothing here needs Jekyll (static HTML,
+no templating, no Liquid), so the build step is skipped entirely and the
+deploy makes no API calls. It cannot fail this way again. Verified: build
+for fe477cd/ddc6fac went to `built` in ~40 seconds during the same
+incident.
+
 ## Known debt (post-merge)
 
 - **The og-image is old-design branding.** `assets/og-image.png` was made
@@ -182,16 +213,11 @@ structurally and then deleted; it was never committed.
 
 ## Open questions for John
 
-1. Merge to main? (The only remaining gate.)
-2. `README.md` still says "John Edgar Rojas" (repo docs, not page copy,
-   and not in the approved change list; the full name may well be correct
-   there). Leave, or align with the page?
-3. The v4 head carries og:image but none of the other OG/Twitter tags the
-   old design had (og:type, og:url, og:title, og:description,
-   twitter:card/title/description/image, canonical, og:image:width and
-   :height). Only the image tag was approved. Want the rest back?
-4. Final look on the real domain after merge, plus the og-image refresh
-   noted under Known debt.
+1. ~~Merge to main?~~ Done 2026-07-17, live and verified.
+2. ~~README name~~ / ~~full OG suite~~ / ~~favicon~~: all approved and
+   shipped.
+3. The og-image artwork refresh (see Known debt) is the one open item.
+4. Delete the `code-review-redesign` branch now that it is merged?
 
 ## Session log
 
@@ -219,3 +245,14 @@ structurally and then deleted; it was never committed.
   as out of the approved list; og:image absolute per scraper requirement |
   Handoff: John reviews once more, then says "merge" | Open: README name,
   the rest of the OG suite, og-image artwork refresh post-merge.
+- 2026-07-17 | Claude (Opus 4.8) | John approved the README name and the
+  full OG/Twitter suite; synced design record first, derived, full suite
+  green (32/32 fixed-facts, 20 links); MERGED to main (ff, 9 commits) and
+  pushed. First Pages build failed on the Jekyll github-metadata plugin
+  hitting a 503 during a GitHub REST API incident; John diagnosed it and
+  called for `.nojekyll`, which fixed it. Live and verified: page renders
+  its own manifest (4/4 pass, fe477cd), 5 requests all same-origin, unfurl
+  tags serve correctly to a scraper UA | Decisions: og:image dimensions
+  read from the PNG IHDR rather than inherited as a claim; .nojekyll over
+  waiting out the incident, since nothing here needs Jekyll | Open:
+  og-image artwork refresh; delete the merged branch?
