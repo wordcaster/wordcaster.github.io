@@ -10,9 +10,13 @@ Why no framework: the page is a single column of prose with one small interactiv
 
 ## Files
 
-- `index.html`: structure and all copy
-- `styles.css`: theming (light and dark), layout, the gate demo styles
-- `main.js`: theme toggle, Dev.to feed, gate demo
+- `index.html`: structure and all copy, including the Selected work block generated from `projects.json`
+- `styles.css`: theming (light and dark), typography, layout, the boot sequence, the gate demo styles
+- `main.js`: boot sequence, theme toggle, Dev.to feed, evidence annotations, manifest block, gate demo
+- `projects.json`: the substrate for the Selected work cards
+- `tools/`: the repo's own checks and generators (plain Node, no dependencies)
+- `.github/workflows/review.yml`: the deploy Action; see "What the Action checks"
+- `manifest.json`: written by the Action on every push to main; never edited by hand
 - `assets/`: favicon and Open Graph image
 
 ## How the feed works
@@ -21,9 +25,30 @@ The Writing section fetches `https://dev.to/api/articles?username=wordcaster` cl
 
 The two newest articles are also hard-coded in `index.html` as a static fallback. The script only replaces that list after a successful fetch, so any failure (network, CORS, empty response) silently leaves the fallback in place.
 
-## Adding a Selected work entry
+## What the deploy Action checks
 
-Copy one `<article class="work-entry">` block in `index.html` (inside the `#selected` section), paste it below the existing one, and edit its title, body paragraph, and links. That block is the entire data structure; nothing else changes.
+Every push to main runs `.github/workflows/review.yml`: four real checks, then a manifest of what ran.
+
+1. **html-validate**: `npx html-validate@<pinned> index.html`
+2. **link-check**: `node tools/check-links.mjs`; internal files, fragment anchors, and external URLs, with two documented exceptions (LinkedIn blocks non-browser clients and is reported as skipped; `manifest.json` may be absent before the first deploy)
+3. **prose-lint**: `node tools/prose-lint.mjs`; no will/would future constructions (exemptions live in `tools/prose-lint-allow.json`, each with a reason), no em dashes, no double spaces, measured on visible copy only
+4. **cards-match-substrate**: `node tools/render-cards.mjs --check`; regenerates the Selected work block from `projects.json` and fails on any drift from what `index.html` actually contains
+
+The Action then writes `manifest.json` (deployed sha, build time, the checks that ran and their results) and commits it. The manifest only ever names checks that ran: `tools/write-manifest.mjs` maps step outcomes to entries and omits anything that did not execute. The page renders the file as found.
+
+**To add a check**, make both edits or neither: add the step to `review.yml` (with an `id`, `continue-on-error: true`, and its outcome passed through `env` to the manifest step), and add its `{ name, env }` pair to `CHECKS` in `tools/write-manifest.mjs`. A check that runs without being recorded is invisible; a name without a step is a lie the manifest is built to make impossible.
+
+The manifest commit cannot start a second run: the trigger ignores `manifest.json` by path, and the commit message carries `[skip ci]` as an independent second brake.
+
+## Updating Selected work
+
+The cards are generated; `projects.json` is the source of truth.
+
+1. Edit `projects.json` (fields: `id`, `name`, `status` of `shipped` or `in-progress`, `description`, `proves`, `links`, optional `repo` for the last-activity line, optional `attribution_note` which must appear verbatim in the description).
+2. Run `node tools/render-cards.mjs` to regenerate the block in `index.html`.
+3. Commit both files together. The Action's cards-match-substrate check fails any commit that edits one without the other, which is the point.
+
+This substrate is what a future scheduled job drives via PRs; today the loop is manual.
 
 ## License
 
