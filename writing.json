@@ -1,0 +1,45 @@
+{
+  "comment": "Source of truth for the 03 · writing section. tools/render.js regenerates index.html from this file; edit here, then run: node tools/render.js. Series carry status (in-progress | complete) and order (higher = newer). The newest series renders as an expanded thread; any older series with status complete renders as one collapsed details line that expands to the full thread.",
+  "serieslabel": "Written as the system was built, one piece per layer. These are less writing samples than evidence.",
+  "series": [
+    {
+      "name": "the gating series",
+      "status": "complete",
+      "order": 1,
+      "parts": [
+        {
+          "date": "2026-05-14",
+          "title": "I kept saying the same five things in every doc review. So I made them defaults",
+          "url": "https://dev.to/wordcaster/i-kept-saying-the-same-five-things-in-every-doc-review-so-i-made-them-defaults-3lo4"
+        },
+        {
+          "date": "2026-05-24",
+          "title": "Checkbox theater: how I stopped trusting my AI agent to run the checks",
+          "url": "https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1"
+        },
+        {
+          "date": "2026-06-14",
+          "title": "Mechanical pattern gates: how I turned recurring review comments into scans",
+          "url": "https://dev.to/wordcaster/mechanical-pattern-gates-how-i-turned-recurring-review-comments-into-scans-1c90"
+        },
+        {
+          "date": "2026-06-21",
+          "title": "Capturing review lessons: how I stopped my feedback loop from depending on my memory",
+          "url": "https://dev.to/wordcaster/capturing-review-lessons-how-i-stopped-my-feedback-loop-from-depending-on-my-memory-j89"
+        }
+      ]
+    }
+  ],
+  "standalones": [
+    {
+      "date": "2026-06-28",
+      "title": "I built a docs site without writing the docs: the part that was mine was a layer up",
+      "url": "https://dev.to/wordcaster/i-built-a-docs-site-without-writing-the-docs-the-part-that-was-mine-was-a-layer-up-5d5c"
+    },
+    {
+      "date": "2026-03-28",
+      "title": "What AI actually changed about my work as a technical writer",
+      "url": "https://dev.to/wordcaster/what-ai-actually-changed-about-my-work-as-a-technical-writer-2edh"
+    }
+  ]
+}

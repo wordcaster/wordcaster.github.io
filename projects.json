@@ -1,0 +1,38 @@
+{
+  "comment": "Source of truth for the 02 · selected work rows. tools/render.js regenerates index.html from this file; edit here, then run: node tools/render.js. Fields desc, pre and act.text may carry inline HTML (mark.anchor, span.ok) and are inserted verbatim.",
+  "projects": [
+    {
+      "title": "AI documentation review gating system",
+      "status": "✓ shipped · in production",
+      "proves": "proves: verification-system design · agent orchestration",
+      "desc": "A five-dimension review architecture where <mark class=\"anchor\">every check must produce a machine-readable artifact</mark> before the agent may act on its results. Scans, a blocking shell hook, and a gap log that turns review misses into new automated checks.",
+      "attr": "Built on top of my team's agent tooling. The verification layer is the part I designed.",
+      "review": {
+        "icon": "ok",
+        "label": "review · enforcement",
+        "pre": "artifacts pinned to HEAD\nposts denied without them\nfails open by design",
+        "cnote": "Knowing when not to gate is the senior half of gating.",
+        "act": {
+          "href": "https://dev.to/wordcaster/checkbox-theater-how-i-stopped-trusting-my-ai-agent-to-run-the-checks-2gf1",
+          "text": "read the full story →"
+        }
+      }
+    },
+    {
+      "title": "LangExtract documentation site",
+      "status": "✓ shipped · live",
+      "proves": "proves: information architecture · docs-as-code · from-scratch build",
+      "desc": "A popular LLM extraction library whose entire documentation was one flat README. Rebuilt as a structured Docusaurus site: <mark class=\"anchor\">content model first</mark>, twelve pages, quickstart to API reference.",
+      "review": {
+        "icon": "ok",
+        "label": "review · verification",
+        "pre": "12 pages · Diátaxis\nindependent review:\n<span class=\"ok\">0 accuracy errors</span>",
+        "cnote": "Reviewed for accuracy after the build, by someone who wasn't me.",
+        "act": {
+          "href": "https://wordcaster.github.io/langextract/",
+          "text": "visit the site →"
+        }
+      }
+    }
+  ]
+}
