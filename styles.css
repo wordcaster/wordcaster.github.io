@@ -260,12 +260,12 @@ html.boot-reveal .site-footer {
   animation: boot-rise 260ms ease-out both;
 }
 
-html.boot-reveal main > section:nth-of-type(2) { animation-delay: 80ms; }
-html.boot-reveal main > section:nth-of-type(3) { animation-delay: 150ms; }
-html.boot-reveal main > section:nth-of-type(4) { animation-delay: 220ms; }
-html.boot-reveal main > section:nth-of-type(5) { animation-delay: 290ms; }
-html.boot-reveal main > section:nth-of-type(6) { animation-delay: 350ms; }
-html.boot-reveal .site-footer { animation-delay: 400ms; }
+html.boot-reveal main > section:nth-of-type(2) { animation-delay: 60ms; }
+html.boot-reveal main > section:nth-of-type(3) { animation-delay: 120ms; }
+html.boot-reveal main > section:nth-of-type(4) { animation-delay: 180ms; }
+html.boot-reveal main > section:nth-of-type(5) { animation-delay: 240ms; }
+html.boot-reveal main > section:nth-of-type(6) { animation-delay: 300ms; }
+html.boot-reveal .site-footer { animation-delay: 340ms; }
 
 @keyframes boot-rise {
   from {

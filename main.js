@@ -16,11 +16,11 @@
 
   var CMD = '$ review index.html';
   var DIMS = ['clarity', 'readability', 'style', 'completeness', 'accuracy'];
-  var TYPE_MS = 200;
-  var DIM_START = 260;
-  var DIM_GAP = 62;
+  var TYPE_MS = 180;
+  var DIM_START = 240;
+  var DIM_GAP = 56;
   var PASS_AT = DIM_START + DIM_GAP * DIMS.length + 40;
-  var REVEAL_AT = PASS_AT + 150;
+  var REVEAL_AT = PASS_AT + 140;
 
   var timers = [];
   var done = false;
@@ -102,7 +102,7 @@
       markEnd();
     }
     if (footer) footer.addEventListener('animationend', settle, { once: true });
-    window.setTimeout(settle, 800);
+    window.setTimeout(settle, 640);
   }
 
   function skip() { finish(true); }
