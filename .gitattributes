@@ -1,0 +1,5 @@
+# Everything text is LF, everywhere. The cards-match-substrate check compares
+# bytes between a generated fragment and index.html; letting line endings vary
+# by OS would make that comparison depend on who ran it.
+* text=auto eol=lf
+*.png binary
