@@ -3,6 +3,15 @@
 Continuity record for agents and humans working on wordcaster.github.io.
 Read this first; update it last.
 
+## Known debt (post-merge)
+
+- **The og-image is old-design branding.** `assets/og-image.png` was made
+  for the previous design and predates the v4 page, the "John Rojas" name,
+  and the "technical writer → documentation engineer" positioning. The tag
+  is wired up and resolves (HTTP 200 live), so link previews work, but the
+  artwork is stale. Needs a refresh after merge. The favicon
+  (`assets/favicon.svg`) is design-neutral and does not have this problem.
+
 ## Current state (2026-07-16, second session)
 
 Branch `code-review-redesign` holds the v4 page design, integrated and
@@ -16,12 +25,26 @@ untouched, as a record.
 
 What this branch contains:
 
-1. **The v4 design**, human-blessed, committed verbatim as
+1. **The v4 design**, human-blessed, committed as
    `design/v4-source.html`. `index.html` is DERIVED from it with exactly
    three integration transforms and nothing else: (a) self-hosted fonts,
    (b) live-value placeholders plus the manifest renderer script,
    (c) `font-weight:650` normalized to 600 (IBM Plex has no 650). Copy is
    final; do not restyle or rewrite.
+
+   **Copy amendment, 2026-07-16 (approved in chat, design-final).** Four
+   changes, applied to the design record FIRST and then derived, so the
+   design file stays the canonical reference:
+   - kicker → `technical writer → documentation engineer · 17 years`
+   - h1 and `<title>` → "John Rojas" (was "John Edgar Rojas")
+   - topbar repo slug → `wordcaster / john-rojas`
+   - added `<link rel="icon">` (assets/favicon.svg) and
+     `<meta property="og:image">` (absolute URL, as OG scrapers require)
+   Contact line and order confirmed unchanged. "17 years" unchanged.
+   The coupling that matters: `tools/prose-lint-allow.json` pins the
+   document title VERBATIM to exempt its em dash, so the title and that
+   snippet must move together or prose_lint fails. It was updated in the
+   same commit.
 2. **Self-hosted fonts**: latin-subset woff2 under `fonts/`, 75KB total
    (budget 120KB). IBM Plex Sans is the v23 variable file, one request for
    weights 400-600; Mono 400/500 are static instances. OFL license
@@ -85,6 +108,14 @@ What this branch contains:
   before the first manifest exists.
 - **manifest.json is not gitignored**: CI must commit it on main. It is
   simply absent on this branch.
+- **The kicker arrow (U+2192) is not IBM Plex's glyph, by design.** The
+  Plex latin subset does not contain → at all (verified in the cmap, not
+  merely excluded by unicode-range), so it falls through the `--mono`
+  stack to `ui-monospace`. Measured: letters take Plex's 7.2px advance,
+  the arrow takes the system mono 6.6px advance. It still renders in a
+  monospace face, identically to the "view the artifact →" arrows the
+  blessed design already had. Re-subsetting to add → was rejected: it
+  would change how those existing arrows render, which is a design change.
 
 ## Verification notes (what was actually run)
 
@@ -152,10 +183,15 @@ structurally and then deleted; it was never committed.
 ## Open questions for John
 
 1. Merge to main? (The only remaining gate.)
-2. The v4 head has no favicon/og-image links; `assets/` still carries
-   both files. Add the two link tags (a copy change to the blessed head,
-   so John's call), or leave as is?
-3. Final look on the real domain after merge.
+2. `README.md` still says "John Edgar Rojas" (repo docs, not page copy,
+   and not in the approved change list; the full name may well be correct
+   there). Leave, or align with the page?
+3. The v4 head carries og:image but none of the other OG/Twitter tags the
+   old design had (og:type, og:url, og:title, og:description,
+   twitter:card/title/description/image, canonical, og:image:width and
+   :height). Only the image tag was approved. Want the rest back?
+4. Final look on the real domain after merge, plus the og-image refresh
+   noted under Known debt.
 
 ## Session log
 
@@ -173,3 +209,13 @@ structurally and then deleted; it was never committed.
   end markers, rule-scoped lint allowlist, scoped html-validate config,
   .x fail styling | Handoff: John reviews preview and says "merge" |
   Open: merge gate, favicon/og links, pixels on the real domain.
+- 2026-07-16 | Claude (Opus 4.8) | Applied John's four approved copy
+  changes (arrow kicker, John Rojas in h1/title, john-rojas repo slug,
+  favicon + og:image tags) to the design record first, then derived;
+  updated the prose-lint title snippet in lockstep; full suite re-run
+  (19 links now, +favicon internal +og-image external, both 200) |
+  Decisions: kept font subsetting untouched so the arrow falls back to
+  system mono like the design's existing arrows; left README name alone
+  as out of the approved list; og:image absolute per scraper requirement |
+  Handoff: John reviews once more, then says "merge" | Open: README name,
+  the rest of the OG suite, og-image artwork refresh post-merge.
