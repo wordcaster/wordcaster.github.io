@@ -1,6 +1,6 @@
 # wordcaster.github.io
 
-One-page portfolio for John Edgar Rojas, senior technical writer and documentation engineer in Amsterdam. Live at https://wordcaster.github.io.
+One-page portfolio for John Rojas, senior technical writer and documentation engineer in Amsterdam. Live at https://wordcaster.github.io.
 
 ## Stack
 
