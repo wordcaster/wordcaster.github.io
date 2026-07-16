@@ -230,8 +230,19 @@
   });
 
   document.addEventListener('keydown', function (e) {
-    if (e.key === 'Escape') closeAll(null);
+    if (e.key !== 'Escape') return;
+    var open = document.querySelector('.evidence-note.is-open');
+    closeAll(null);
+    if (open && open.contains(document.activeElement)) {
+      var trigger = open.querySelector('.evidence-trigger');
+      if (trigger) trigger.focus();
+    }
   });
+
+  /* Only now that the toggles are wired does JS take over keyboard reveal
+     from the CSS :focus-within fallback; see the stylesheet's
+     .js-annotations note. */
+  document.documentElement.classList.add('js-annotations');
 })();
 
 /* Manifest block. Renders manifest.json exactly as found, so a check name

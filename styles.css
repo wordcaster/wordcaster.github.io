@@ -327,7 +327,8 @@ html.boot-reveal .site-footer { animation-delay: 340ms; }
   font-size: 0.675rem;
   padding: 0.15rem 0.5rem;
   margin-left: 0.5rem;
-  border: 1px solid color-mix(in srgb, var(--pass) 45%, transparent);
+  border: 1px solid;
+  border-color: color-mix(in srgb, var(--pass) 45%, transparent);
   border-radius: 999px;
   background: color-mix(in srgb, var(--pass) 10%, transparent);
   color: var(--pass);
@@ -537,9 +538,21 @@ html.boot-reveal .site-footer { animation-delay: 340ms; }
 
 /* Evidence annotations. A claim carries its receipt: the trigger is part of
    the sentence, the card is the artifact. CSS alone reveals on hover and
-   focus, so the receipts survive without JavaScript. */
-p:has(> .evidence-note) {
+   focus, so the receipts survive without JavaScript. The card anchors to
+   the claim's paragraph; browsers without :has() get the inline note as a
+   fallback anchor, which keeps the card beside its claim. */
+.evidence-note {
   position: relative;
+}
+
+@supports selector(p:has(> span)) {
+  p:has(> .evidence-note) {
+    position: relative;
+  }
+
+  .evidence-note {
+    position: static;
+  }
 }
 
 .evidence-trigger {
@@ -577,7 +590,10 @@ p:has(> .evidence-note) {
   transition: opacity 120ms ease 200ms, visibility 0s linear 320ms;
 }
 
-.evidence-note:focus-within .evidence-card,
+/* Focus alone reveals the card only when JavaScript is not driving the
+   state (html lacks .js-annotations); with JS on, the button's toggle owns
+   keyboard reveal so aria-expanded always tells the truth. */
+html:not(.js-annotations) .evidence-note:focus-within .evidence-card,
 .evidence-note.is-open .evidence-card {
   visibility: visible;
   opacity: 1;

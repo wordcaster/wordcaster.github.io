@@ -29,7 +29,7 @@ The two newest articles are also hard-coded in `index.html` as a static fallback
 
 Every push to main runs `.github/workflows/review.yml`: four real checks, then a manifest of what ran.
 
-1. **html-validate**: `npx html-validate@<pinned> index.html`
+1. **html-validate**: exact-pinned via a dedicated install step (its transitive dependencies are the one unpinned surface; this repo keeps no package.json by design)
 2. **link-check**: `node tools/check-links.mjs`; internal files, fragment anchors, and external URLs, with two documented exceptions (LinkedIn blocks non-browser clients and is reported as skipped; `manifest.json` may be absent before the first deploy)
 3. **prose-lint**: `node tools/prose-lint.mjs`; no will/would future constructions (exemptions live in `tools/prose-lint-allow.json`, each with a reason), no em dashes, no double spaces, measured on visible copy only
 4. **cards-match-substrate**: `node tools/render-cards.mjs --check`; regenerates the Selected work block from `projects.json` and fails on any drift from what `index.html` actually contains
