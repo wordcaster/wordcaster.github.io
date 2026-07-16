@@ -1,0 +1,7 @@
+[
+  {
+    "snippet": "John Edgar Rojas — Documentation engineering and verification",
+    "rule": "no-em-dash",
+    "reason": "The document title, from the blessed v4 design. It is tab metadata, not body prose, and the em dash there is deliberate."
+  }
+]
