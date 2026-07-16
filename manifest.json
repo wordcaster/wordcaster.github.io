@@ -1,0 +1,23 @@
+{
+  "sha": "1b9ee9012796cd8b673dba22f823e8639e26e0a5",
+  "short_sha": "1b9ee90",
+  "built_at": "2026-07-16T23:12:35Z",
+  "checks": [
+    {
+      "name": "html_valid",
+      "result": "pass"
+    },
+    {
+      "name": "links_ok",
+      "result": "pass"
+    },
+    {
+      "name": "prose_lint",
+      "result": "pass"
+    },
+    {
+      "name": "drift",
+      "result": "pass"
+    }
+  ]
+}
